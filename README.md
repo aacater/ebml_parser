@@ -6,7 +6,9 @@ https://github.com/Matroska-Org/libebml
 https://github.com/Matroska-Org/ebml-specification
 
 
-needs to be built on unix (requieres unistd.h library)
+needs to be complied on unix (requieres unistd.h library)
+
+I've included my compiled version (file named ebml_parser)
 
 then to run
 
