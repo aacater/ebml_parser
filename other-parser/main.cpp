@@ -1,3 +1,6 @@
+// this parse was found here
+// https://github.com/bwackwat/ebml-parser/blob/master/main.cpp
+
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
