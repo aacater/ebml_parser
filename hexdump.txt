@@ -1,0 +1,44 @@
+Here's the first 24 bytes from the mkv file we have been using to test with.
+
+-- [0x1A][0x45][0xDF][0xA3] are the file signature for mkv files
+0x1A
+0x45
+0xDF
+0xA3
+
+0x93
+
+-- [0x42][0x82] is the identifier for the DocType of the file
+0x42
+0x82
+
+0x88
+
+-- The next 8 bytes are the characters representing the DocType
+0x6D    -- 'm'
+0x61    -- 'a'
+0x74    -- 't'
+0x72    -- 'r'
+0x6F    -- 'o'
+0x73    -- 's'
+0x6B    -- 'k'
+0x61    -- 'a'
+
+
+-- [0x42][0x87] is the identifier for the DocTypeVersion
+0x42
+0x87
+
+0x81
+
+0x2 -- DocTypeVersion = 2
+
+-- [0x42][0x81] is the identifier for the DocTypeReadVersion
+0x42
+0x85
+
+0x81
+
+0x2 -- DocTypeVersion = 2
+
+This is mostly just a submission so that we have something to show for now, but we have been basing a fair bit of our code off of an EBML parser we found online. We plan to rewrite as much of this parser as we can understand, but we have the hex identifiers for the various pieces of the metadata and our plan is to write a parser for these various parts.
