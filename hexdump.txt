@@ -12,7 +12,8 @@ Here's the first 24 bytes from the mkv file we have been using to test with.
 0xDF
 0xA3
 
-0x93
+0x93 -- size of data in element - calculate actualy size by (0x93 XOR mask)
+	 -- the mask in this case is 0x80 so the size is 0x13
 
 -- [0x42][0x82] is the identifier for the DocType of the file
 -- starts with 0x4 so class B and 2 bytes long

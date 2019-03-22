@@ -4,6 +4,11 @@
 // This file reads the binary data from a file and prints it in bytes
 //     currently, only the very first bits are parsed, but we have
 //     plans to write the rest
+// TODO:
+//	 fix get_element
+//		couldn't get it to work in ebml.cpp. something about unresolved external symbols
+//	write parser class and general cleanup
+//		write functions for dealing with reading and tracking position
 
 #include "ebml.h"
 #include "spec.h"
