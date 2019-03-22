@@ -1,6 +1,12 @@
 Here's the first 24 bytes from the mkv file we have been using to test with.
 
+-- Class A (0x8): 1 byte
+-- Class B (0x4): 2 bytes
+-- Class C (0x2): 3 bytes
+-- Class D (0x1): 4 bytes
+
 -- [0x1A][0x45][0xDF][0xA3] are the file signature for mkv files
+-- the first 0x1 means the elemnt is class D and so will be 4 bytes long.
 0x1A
 0x45
 0xDF
@@ -9,6 +15,7 @@ Here's the first 24 bytes from the mkv file we have been using to test with.
 0x93
 
 -- [0x42][0x82] is the identifier for the DocType of the file
+-- starts with 0x4 so class B and 2 bytes long
 0x42
 0x82
 
@@ -41,4 +48,8 @@ Here's the first 24 bytes from the mkv file we have been using to test with.
 
 0x2 -- DocTypeVersion = 2
 
-This is mostly just a submission so that we have something to show for now, but we have been basing a fair bit of our code off of an EBML parser we found online. We plan to rewrite as much of this parser as we can understand, but we have the hex identifiers for the various pieces of the metadata and our plan is to write a parser for these various parts.
+This is mostly just a submission so that we have something to show for now,
+but we have been basing a fair bit of our code off of an EBML parser we found online. 
+We plan to rewrite as much of this parser as we can understand, 
+but we have the hex identifiers for the various pieces of 
+the metadata and our plan is to write a parser for these various parts.

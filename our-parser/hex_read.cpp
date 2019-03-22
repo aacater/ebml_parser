@@ -5,19 +5,42 @@
 //     currently, only the very first bits are parsed, but we have
 //     plans to write the rest
 
-#include <iostream>
+#include "ebml.h"
+#include "spec.h"
 using std::cout;
 using std::endl;
-#include <fstream>
+using std::array;
+using std::string;
+
 using std::ios;
 
-#define READLEN 1 // read one byte
+
+#define BUFSIZE 1024
+// couldn't get it to work in ebml.cpp
+ebml_element get_element2(array<uint8_t, 4> id, uint8_t level) {
+	bool found;
+	for (int i = 0; i < SPEC_LEN; ++i) {
+		found = true;
+		for (int j = 0; j < level; ++j) { // check for matching id
+			if (getSpecPointer()[i].id[j] != id[j]) {
+				found = false;
+				break;
+			}
+		}
+		if (found) {	// if found return the element info
+			return getSpecPointer()[i];
+		}
+	}
+	return 0;
+}
 
 int main()
 {
+	uint8_t buffer[BUFSIZE];
+	int mask = 0x80;
+	int counter = 0;
 
-	unsigned char readByte;
-	char read;
+	// open test mkv file
     std::ifstream infile;
     infile.open("../test1.mkv", ios::binary | ios::in);
     if (!infile.is_open())
@@ -25,56 +48,64 @@ int main()
         cout << "Error opening input file" << endl;
         return 0;
     }
-    int position = 0;
-    while (infile.read(&read, READLEN))
+	int pos = 0;
+    while (true)
     {
-		unsigned char readByte = (unsigned char)read;
-        position++;
-        if (position == 5) break;
+		counter++;
+		//read one byte from file
+		infile.read(reinterpret_cast<char*>(&buffer[pos]), 1);
+		// find first high bit, this shows the class of the ID
+		elementData id;
+		id.width = 1;
+		mask = 0x80;
+		while (!(buffer[pos] & mask)) { // find class
+			mask >>= 1;
+			id.width++;
+		}
+		printf("Element ID First Byte: 0x%X (len: %d)\n", buffer[pos], id.width);
+		pos++;
 
+		// read full element ID using the width of class
+		infile.read(reinterpret_cast<char*>(&buffer[pos]), id.width - 1);
+		// print full element ID
+		printf("Element ID Bytes: 0x");
+		for (int i = 0; i < id.width; ++i) {
+			id.data[i] = buffer[pos+i-1];
+			printf("%X", id.data[i]);
+		}
+		printf("\n");
+		pos += id.width - 1;
+
+		// get Element Size
+		infile.read(reinterpret_cast<char*>(&buffer[pos]), 1);
+		elementData size;
+		size.width = 1;
+		mask = 0x80;
+		while (!(buffer[pos] & mask)) { // find class
+			mask >>= 1;
+			size.width++;
+		}
+		printf("Element ID First Byte: 0x%X (len: %d)\n", buffer[pos], size.width);
+		// XOR - for some reason this calculates the actual size
+		// I think because for the element ID the class bits are included where as for the size the class is not included in the actual size.
+		// if it was all the sizes would be very big (because theres a high bit in one of the most signifigant bits)
+		buffer[pos] = buffer[pos] ^ mask; 
+		pos++;
 		
-		unsigned char highBits = readByte >> 4; // get high 4-bits
-		printf("0x%X\n", highBits);
-
-
-		printf("Element ID First Byte: %X\n", readByte);
-		int idLen = 1;
-		switch (highBits) // class dictates how long in bytes the element id 
-		{
-		case 0x8:
-			cout << "Class A ID" << endl;
-			idLen = 1;
-			break;
-		case 0x4:
-			cout << "Class B ID" << endl;
-			idLen = 2;
-			break;
-		case 0x2:
-			cout << "Class C ID" << endl;
-			idLen = 3;
-			break;
-		case 0x1:
-			cout << "Class D ID" << endl;
-			idLen = 4;
-			break;
-		default:
-			cout << "Unknown Class" << endl;
-			break;
+		printf("Element Size Bytes: 0x");
+		for (int i = 0; i < size.width; ++i) {
+			size.data[i] = buffer[pos+i-1];
+			printf("%X", size.data[i]);
 		}
-		idLen = 2;
-		unsigned char elementId[4];
-		elementId[3] = readByte;
+		printf("\n");
+		pos += size.width - 1;
+		array<uint8_t, 4> idarr = { id.data[0], id.data[1], id.data[2], id.data[3] };
+		auto ele = get_element2(idarr, id.width);
+		printf("(%d) %s\n", pos, ele.name);
 
-		for (int i = 1; i < idLen; i++) // atempting to put the read bytes into a character array. getting messed up with endianess.
-		{
-			infile.read(&read, READLEN);
-			printf("READ: %X\n", (unsigned char)read);
-			elementId[idLen] = (unsigned char)read;
-		}
-		printf("Element ID Bytes: 0x%X%X%X%X\n", elementId[3], elementId[2], elementId[1], elementId[0]);
-		printf("Element ID Bytes: %X\n", elementId);
 
-		break;
+		if(counter > 1)
+			break;
     }
 	system("PAUSE"); // stop visual studio from exiting
 }
