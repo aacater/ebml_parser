@@ -23,7 +23,7 @@ void print(string name, string data, ebml_element_type type, uint8_t * id, uint8
 	cout << "\n------------------------------------------------" << endl;
 	printf("(%s at %d) %s []\n", stringify(type), position, name.c_str());
 	cout << "Element ID: 0x" << std::hex << convHex(id, idWidth) << " of width " << std::hex << convHex(&idWidth) << endl;
-	cout << "Element Size: " << convHex(size, sizeWidth) << " of width " << std::hex << convHex(&sizeWidth) << endl;
+	cout << "Element Size: " << std::dec << convHex(size, sizeWidth) << " of width " << std::hex << convHex(&sizeWidth) << endl;
 	cout << "------------------------------------------------" << endl;
 }
 
@@ -34,17 +34,19 @@ void parseFile(string fileName)
 	cout << "File size: " << size << " bytes."<< endl;
 
 	int pos = 0;
-	while (pos < 10)
+	while (pos < 16)
 	{
 		parse p = parse(fileName, pos);
-		cout << "POS: " << p.getPositionFile() << endl;
+		//cout << "POS: " << p.getPositionFile() << endl;
 		p.parseElement();
 
 		string name;
-		ebml_element_type type = STRING;
+		ebml_element_type type;
 		p.lookupElement(p.getID(), p.getIDWidth(), name, type);
 		print(name, "data", type, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), p.getPositionFile());
 		pos = p.getPositionFile();
+
+
 		//delete p;
 	}
 }
