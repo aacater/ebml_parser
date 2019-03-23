@@ -29,13 +29,13 @@ readFile::~readFile()
 // overloaded to read from different positions in file and to different positions in the buffer
 uint8_t * readFile::readBits(int amount)
 {
+	file.seekg(positionFile);
 	int bufStart = positionBuffer;
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
 	positionBuffer += amount;
 	positionFile += amount;
 
 	return &buffer[bufStart];
-	//return getData(save);
 }
 
 uint8_t * readFile::readBits(int amount, int posFile)
@@ -50,27 +50,12 @@ uint8_t * readFile::readBits(int amount, int posFile)
 	positionFile = posFile + amount;
 
 	return &buffer[bufStart];
-	//return getData(save);
 }
 
 // returns pointer to buffer
 uint8_t * readFile::getBuffer()
 {
 	return (uint8_t *)buffer;
-}
-
-// returns read data
-uint8_t * readFile::getData(int amount)
-{
-	positionBuffer -= amount;
-	uint8_t* data = (uint8_t*)malloc(amount);
-	for (int i = 0; i < amount; i++)
-	{
-		data[i] = buffer[positionBuffer];
-		positionBuffer++;
-		std::cout << positionBuffer << std::endl;
-	}
-	return data;
 }
 
 int readFile::getPositionFile()
