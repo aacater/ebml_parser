@@ -10,7 +10,7 @@ uint8_t * parse::parseEleSizeorID(bool size)
 	int mask = 0x80;
 	int width = 1;
 	uint8_t* firstByte = file.readBits(1); // read first byte
-	//std::cout << "First Byte: 0x" << std::hex << convHex(firstByte, 1) << std::endl;
+	//std::cout << "First Byte: 0x" << std::hex << getuint64(firstByte, 1) << std::endl;
 	while (!(firstByte[0] & mask)) 
 	{ // find first zero bit, this shows width
 		mask >>= 1;
@@ -102,13 +102,25 @@ void parse::getData(std::ostream & os)
 {
 	switch (type)
 	{
+	case MASTER:
+	{
+		os << "N/A";
+		break;
+	}
 	case STRING:
 	{
-		uint8_t * data = file.readBits(convHex(size, sizeWidth));
+		uint8_t * data = file.readBits(getuint64(size, sizeWidth));
 		os << std::hex << data;
 		break;
 	}
+	case UINT:
+	{
+		uint8_t * data = file.readBits(getuint64(size, sizeWidth));
+		os << getuint64(data, sizeWidth);
+		break;
+	}
 	default:
+		file.readBits(getuint64(size, sizeWidth));
 		break;
 	}
 }

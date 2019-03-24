@@ -13,8 +13,6 @@
 #include "helper.h"
 #include "ebml.h"
 
-#define stringify( type ) # type
-
 using std::string;
 using std::cout;
 using std::endl;
@@ -27,12 +25,11 @@ void print(string name, string data, string type, uint8_t * id, uint8_t idWidth,
 		mask >>= 1;
 	}
 
-	cout << "\n------------------------------------------------" << endl;
+	cout << "\n------------------------------------------------\n" << endl;
 	cout << "(" << type << " at " << std::dec << position << ") " << name << " [" << p << "]" << endl;
 	cout << std::showbase << std::hex << std::nouppercase;
-	cout << "Element ID: " << convHex(id, idWidth) << " of width " << std::noshowbase << convHex(&idWidth) << endl;
-	cout << "Element Size: (" << std::showbase << (size[0] ^ mask) << ") " << std::noshowbase << std::dec << convHex(size, sizeWidth) << " of width " << std::hex << convHex(&sizeWidth) << endl;
-	cout << "------------------------------------------------" << endl;
+	cout << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << endl;
+	cout << "Element Size: (" << std::showbase << (size[0] ^ mask) << ") " << std::noshowbase << std::dec << getuint64(size, sizeWidth) << " of width " << std::hex << getuint64(&sizeWidth) << endl;
 }
 
 void parseFile(string fileName)
@@ -42,7 +39,7 @@ void parseFile(string fileName)
 	cout << "File size: " << size << " bytes."<< endl;
 
 	int pos = 0;
-	while (pos < 16)
+	while (pos < 20)
 	{
 		parse p = parse(fileName, pos);
 		//cout << "POS: " << p.getPositionFile() << endl;
@@ -53,9 +50,6 @@ void parseFile(string fileName)
 
 		print(name, "data", typeName, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), p.getPositionFile(), p);
 		pos = p.getPositionFile();
-
-
-		//delete p;
 	}
 }
 
