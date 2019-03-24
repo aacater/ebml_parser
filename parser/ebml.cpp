@@ -1,5 +1,12 @@
 #include "ebml.h"
 
+string ebmlTypeName[8] = { "MASTER", "UNIT", "INT", "STRING", "UTF8", "BINARY", "FLOAT", "DATE" };
+
+string getebmlTypeName(enum ebml_element_type type)
+{
+	return ebmlTypeName[type];
+}
+
 const ebml_element * ebml_spec[SPEC_LEN] =
 {
 	new ebml_element("EBML", {{0x1a, 0x45, 0xdf, 0xa3}}, MASTER),

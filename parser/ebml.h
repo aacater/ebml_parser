@@ -31,13 +31,11 @@ public:
 	array<uint8_t, 4> id;
 	enum ebml_element_type type;
 
-	ebml_element() {};
-	ebml_element(int) {};
-
 	ebml_element(string name, array<uint8_t, 4> const& id, enum ebml_element_type type)
 		:name(name), id(id), type(type) {}
 };
 
+string getebmlTypeName(enum ebml_element_type type);
 extern const ebml_element * ebml_spec[SPEC_LEN];
 
 #endif

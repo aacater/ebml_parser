@@ -11,6 +11,7 @@
 
 #include "parse.h"
 #include "helper.h"
+#include "ebml.h"
 
 #define stringify( type ) # type
 
@@ -18,12 +19,19 @@ using std::string;
 using std::cout;
 using std::endl;
 
-void print(string name, string data, ebml_element_type type, uint8_t * id, uint8_t idWidth, uint8_t * size, uint8_t sizeWidth, int position)
+void print(string name, string data, string type, uint8_t * id, uint8_t idWidth, uint8_t * size, uint8_t sizeWidth, int position, parse& p)
 {
+	int mask = 0x80;
+	for (int i = 1; i < sizeWidth; i++)
+	{ // calculate first byte of size
+		mask >>= 1;
+	}
+
 	cout << "\n------------------------------------------------" << endl;
-	printf("(%s at %d) %s []\n", stringify(type), position, name.c_str());
-	cout << "Element ID: 0x" << std::hex << convHex(id, idWidth) << " of width " << std::hex << convHex(&idWidth) << endl;
-	cout << "Element Size: " << std::dec << convHex(size, sizeWidth) << " of width " << std::hex << convHex(&sizeWidth) << endl;
+	cout << "(" << type << " at " << std::dec << position << ") " << name << " [" << p << "]" << endl;
+	cout << std::showbase << std::hex << std::nouppercase;
+	cout << "Element ID: " << convHex(id, idWidth) << " of width " << std::noshowbase << convHex(&idWidth) << endl;
+	cout << "Element Size: (" << std::showbase << (size[0] ^ mask) << ") " << std::noshowbase << std::dec << convHex(size, sizeWidth) << " of width " << std::hex << convHex(&sizeWidth) << endl;
 	cout << "------------------------------------------------" << endl;
 }
 
@@ -40,10 +48,10 @@ void parseFile(string fileName)
 		//cout << "POS: " << p.getPositionFile() << endl;
 		p.parseElement();
 
-		string name;
-		ebml_element_type type;
-		p.lookupElement(p.getID(), p.getIDWidth(), name, type);
-		print(name, "data", type, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), p.getPositionFile());
+		string typeName = getebmlTypeName(p.getType());
+		string name = p.getName();
+
+		print(name, "data", typeName, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), p.getPositionFile(), p);
 		pos = p.getPositionFile();
 
 

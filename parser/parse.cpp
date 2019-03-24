@@ -1,6 +1,7 @@
 #include "parse.h"
 
 using std::string;
+using std::ostream;
 
 // read the first byte and find the class.
 // class specifies the length of the data piece 
@@ -10,7 +11,8 @@ uint8_t * parse::parseEleSizeorID(bool size)
 	int width = 1;
 	uint8_t* firstByte = file.readBits(1); // read first byte
 	//std::cout << "First Byte: 0x" << std::hex << convHex(firstByte, 1) << std::endl;
-	while (!(firstByte[0] & mask)) { // find first zero bit, this shows width
+	while (!(firstByte[0] & mask)) 
+	{ // find first zero bit, this shows width
 		mask >>= 1;
 		width++;
 	}
@@ -27,7 +29,6 @@ uint8_t * parse::parseEleSizeorID(bool size)
 		
 	return readData;
 }
-
 
 uint8_t * parse::getID()
 {
@@ -49,10 +50,25 @@ uint8_t parse::getSizeWidth()
 	return sizeWidth;
 }
 
+string parse::getName()
+{
+	return name;
+}
+
+ebml_element_type parse::getType()
+{
+	return type;
+}
+
 void parse::parseElement()
 {
 	id = parseEleSizeorID(false);
 	size = parseEleSizeorID(true);
+	if (!lookupElement(id, idWidth, name, type))
+	{
+		name = "UNKNOWN";
+	}
+
 }
 
 bool parse::lookupElement(uint8_t * const& id, const int& width, std::string& name, ebml_element_type& type)
@@ -63,10 +79,9 @@ bool parse::lookupElement(uint8_t * const& id, const int& width, std::string& na
 		for (int j = 0; j < width; j++)
 		{ // check each byte of ID
 			if (ebml_spec[i]->id[j] != id[j])
-			{
 				break;
-			}
-			found = true;
+			if(width - 1 == j)
+				found = true;
 		} // if found stop looking
 		if (found)
 		{
@@ -81,4 +96,25 @@ bool parse::lookupElement(uint8_t * const& id, const int& width, std::string& na
 int parse::getPositionFile()
 {
 	return file.getPositionFile();
+}
+
+void parse::getData(std::ostream & os)
+{
+	switch (type)
+	{
+	case STRING:
+	{
+		uint8_t * data = file.readBits(convHex(size, sizeWidth));
+		os << std::hex << data;
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+ostream& operator<<(ostream &os, parse &p)
+{
+	p.getData(os);
+	return os;
 }

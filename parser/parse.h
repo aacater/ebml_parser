@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <ostream>
 #include <string>
 
 #include "readFile.h"
@@ -35,9 +36,16 @@ public:
 	uint8_t * getSize();
 	uint8_t getSizeWidth();
 
+	string getName();
+	enum ebml_element_type getType();
+
 	void parseElement();
 	bool lookupElement(uint8_t* const &id, const int& width, std::string &name, ebml_element_type &type);
 	int getPositionFile();
+
+	void getData(std::ostream &os);
 };
+
+std::ostream& operator<<(std::ostream &os, parse &p);
 
 #endif

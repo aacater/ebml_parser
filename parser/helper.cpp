@@ -1,6 +1,7 @@
 #include "helper.h"
 
 using std::string;
+using std::ostream;
 
 uint64_t convHex(uint8_t* data, int length)
 {
@@ -11,6 +12,7 @@ uint64_t convHex(uint8_t* data, int length)
 	}
 	return value;
 }
+
 uint64_t convHex(uint8_t temp, int length)
 {
 	uint8_t* ptemp;

@@ -28,7 +28,6 @@ public:
 	uint8_t * readBits(int amount);
 	uint8_t * readBits(int amount, int positonFile);
 	uint8_t * getBuffer();
-	uint8_t * getData(int amount);
 	int getPositionFile();
 	void setPositionFile(int pos);
 	int getPositionBuffer();
