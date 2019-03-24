@@ -1,12 +1,20 @@
+// ebml.cpp
+// function definitions for ebml.h
+
 #include "ebml.h"
 
+// string array of ebml type names
 string ebmlTypeName[8] = { "MASTER", "UNIT", "INT", "STRING", "UTF8", "BINARY", "FLOAT", "DATE" };
 
+// returns string of the name of the embl element type based on the enum value
 string getebmlTypeName(enum ebml_element_type type)
 {
 	return ebmlTypeName[type];
 }
 
+// data taken from 
+// https://www.matroska.org/technical/specs/index.html
+// each array index has Element Name, Element ID, and Element Type
 const ebml_element * ebml_spec[SPEC_LEN] =
 {
 	new ebml_element("EBML", {{0x1a, 0x45, 0xdf, 0xa3}}, MASTER),

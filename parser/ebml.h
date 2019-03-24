@@ -1,5 +1,5 @@
 // ebml.h
-// classes and functions for ebml stuff
+// classes and functions for ebml specific stuff
 
 #pragma once
 #ifndef EBML_H_
@@ -25,6 +25,7 @@ enum ebml_element_type { // posible data types
 	DATE	// signed 8 byte integer in nanoseconds
 };
 
+// class containing info about an EMBL element's Name, ID, and Type
 class ebml_element {
 public:
 	string name;
