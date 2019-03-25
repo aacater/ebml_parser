@@ -171,11 +171,11 @@ void parse::getData(std::ostream & os)
 	}
 	case FLOAT:
 	{ // can be 4 or 8 bytes long
-		if (sizeWidth != 4 && sizeWidth != 8)
+		int dataLength = getuint64(size, sizeWidth);
+		if (dataLength != 4 && dataLength != 8)
 			std::cout << "Bad float width.";
-		int64_t val = int64_t(getuint64(data, sizeWidth));
-		float float_val;
-		memcpy(&float_val, &val, sizeWidth);
+		int64_t temp = int64_t(getuint64(data, dataLength));
+		float float_val = *(float *)(&temp); // pointer magic
 		std::cout << std::fixed << std::dec << float_val;
 		break;
 	}
