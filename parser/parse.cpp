@@ -119,6 +119,14 @@ int parse::getPositionFile()
 // prints ebml element data based on element type to ostream 
 void parse::getData(std::ostream & os)
 {
+	if (type == MASTER)
+	{
+		// master type contains other elements so no data to parse
+		os << "N/A";
+		return;
+	}
+
+	uint8_t * data = file.readBits(getuint64(size, sizeWidth));
 	switch (type)
 	{
 	case MASTER:
@@ -129,35 +137,42 @@ void parse::getData(std::ostream & os)
 	case UTF8:
 	case STRING:
 	{
-		uint8_t * data = file.readBits(getuint64(size, sizeWidth));
 		os << std::hex << data;
 		break;
 	}
 	case UINT:
 	{
-		uint8_t * data = file.readBits(getuint64(size, sizeWidth));
 		os << getuint64(data, sizeWidth);
 		break;
 	}
 	case BINARY:
 	{
-		uint8_t * data = file.readBits(getuint64(size, sizeWidth));
-		//os << getuint64(data, sizeWidth);
+		int dataLength = getuint64(size, sizeWidth);
+		if (dataLength > 32)
+		{ // cap printout at 32 bytes
+			dataLength = 32;
+		}
+		os << std::showbase << std::hex << std::nouppercase << getuint64(data,dataLength);
+		if (dataLength == 32)
+		{
+			os << "...";
+		}
+		break;
 	}
 	case FLOAT:
 	{ // can be 4 or 8 bytes long
 		if (sizeWidth != 4 && sizeWidth != 8)
 			std::cout << "Bad float width.";
-		uint8_t * data = file.readBits(getuint64(size, sizeWidth));
 		int64_t val = int64_t(getuint64(data, sizeWidth));
 		float float_val;
 		memcpy(&float_val, &val, sizeWidth);
 		std::cout << std::fixed << std::dec << float_val;
+		break;
 	}
 	case DATE:
 	{ // 8 byte integer in nanosecods
 		// 0 indicating the precise beginning of the millennium
-		uint8_t * data = file.readBits(getuint64(size, sizeWidth));
+		break;
 	}
 	default:
 		file.readBits(getuint64(size, sizeWidth));
