@@ -14,14 +14,25 @@ uint8_t * parse::parseEleSizeorID(bool size)
 {
 	int mask = 0x80;
 	int width = 1;
-	uint8_t* firstByte = file.readBits(1); // read first byte
+	uint8_t * firstByte = file.readBits(1); // read first byte
 	//std::cout << "First Byte: 0x" << std::hex << getuint64(firstByte, 1) << std::endl;
 	while (!(firstByte[0] & mask)) 
 	{ // find first zero bit, this shows width
 		mask >>= 1;
 		width++;
 	}
-	uint8_t * readData = file.readBits(width, file.getPositionFile()-1);
+
+	uint8_t * readData;
+
+	if (width != 1)
+	{
+		readData = file.readBits(width, file.getPositionFile() - 1);
+	}
+	else
+	{
+		readData = firstByte;
+	}
+
 	if (size)
 	{ // if size == true
 		// then have to remove first zero
@@ -125,7 +136,6 @@ void parse::getData(std::ostream & os)
 		os << "N/A";
 		return;
 	}
-
 	uint8_t * data = file.readBits(getuint64(size, sizeWidth));
 	switch (type)
 	{
@@ -137,12 +147,12 @@ void parse::getData(std::ostream & os)
 	case UTF8:
 	case STRING:
 	{
-		os << std::hex << data;
+		os << std::noshowbase << std::hex << std::nouppercase << data;
 		break;
 	}
 	case UINT:
 	{
-		os << getuint64(data, sizeWidth);
+		os << std::noshowbase << std::dec << getuint64(data, getuint64(size, sizeWidth));
 		break;
 	}
 	case BINARY:
@@ -175,7 +185,7 @@ void parse::getData(std::ostream & os)
 		break;
 	}
 	default:
-		file.readBits(getuint64(size, sizeWidth));
+		//file.readBits(getuint64(size, sizeWidth));
 		break;
 	}
 }

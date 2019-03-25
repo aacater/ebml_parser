@@ -11,7 +11,7 @@
 
 #include "helper.h"
 
-#define BUFSIZE 1024
+#define BUFSIZE 104857
 
 class readFile {
 private:

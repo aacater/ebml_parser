@@ -31,7 +31,7 @@ void print(string name, string type, uint8_t * id, uint8_t idWidth, uint8_t * si
 	}
 
 	cout << "\n------------------------------------------------\n" << endl;
-	cout << "(" << std::dec << position << "-" << type << ") " << name << " - " << p << endl;
+	cout << "(" << std::hex << std::showbase << ( position  )<< "-" << type << ") " << name << " - " << p << endl;
 	cout << std::showbase << std::hex << std::nouppercase;
 	cout << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << endl;
 	cout << "Element Size: " << std::dec << getuint64(size, sizeWidth) << " (" << std::showbase << std::hex << (size[0] ^ mask) << " with width "  << std::noshowbase << std::dec << getuint64(&sizeWidth) << ")" << endl;
@@ -45,8 +45,9 @@ void parseFile(string fileName)
 	cout << "File size: " << size << " bytes."<< endl;
 
 	int pos = 0;
-	int startPos = 40;
-	while (pos < startPos+1)
+	int startPos = 0x60;
+	//while (size- 2048 > pos)
+	while (pos < 0x100)
 	{
 		parse p = parse(fileName, pos); // create new parser object for next ebml element to be parsed
 		p.parseElement(); // parse ebml element
@@ -55,13 +56,13 @@ void parseFile(string fileName)
 		string name = p.getName(); // get ebml element name
 		if (p.getPositionFile() > startPos)
 		{
-			print(name, typeName, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), p.getPositionFile(), p); // print parsed info to cout
+			print(name, typeName, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), pos, p); // print parsed info to cout
 		}
 		else
 		{ // for testing
 			// probably not the best way.
 			std::cout.setstate(std::ios_base::badbit);
-			print(name, typeName, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), p.getPositionFile(), p); // print parsed info to cout
+			print(name, typeName, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), pos, p); // print parsed info to cout
 			std::cout.clear();
 		}
 		

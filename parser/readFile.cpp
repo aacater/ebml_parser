@@ -35,7 +35,6 @@ uint8_t * readFile::readBits(int amount)
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
 	positionBuffer += amount;
 	positionFile += amount;
-
 	return &buffer[bufStart];
 }
 
@@ -44,14 +43,10 @@ uint8_t * readFile::readBits(int amount)
 uint8_t * readFile::readBits(int amount, int posFile)
 {
 	int bufStart = positionBuffer;
-	//std::cout << "Reading File: " << amount << " bytes with an offset of " << 0 << "from pos " << posFile << std::endl;
-
 	file.seekg(posFile);
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
-	
 	positionBuffer += amount;
 	positionFile = posFile + amount;
-
 	return &buffer[bufStart];
 }
 
