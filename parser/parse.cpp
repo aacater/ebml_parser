@@ -179,14 +179,23 @@ void parse::getData(std::ostream & os)
 		std::cout << std::fixed << std::dec << float_val;
 		break;
 	}
-	case DATE:
+	case DATE: // TO DO
 	{ // 8 byte integer in nanosecods
 		// 0 indicating the precise beginning of the millennium
+		
+		break;
+	}
+	case INT:
+	{
+		os << std::noshowbase << std::dec << int64_t(getuint64(data, getuint64(size, sizeWidth)));
 		break;
 	}
 	default:
-		//file.readBits(getuint64(size, sizeWidth));
+	{
+		std::cout << "ERROR: Invalid EBML Element Type" << std::endl;
+		exit(-1);
 		break;
+	}
 	}
 }
 

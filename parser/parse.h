@@ -8,8 +8,6 @@
 #include <fstream>
 #include <ostream>
 #include <string>
-#include <chrono>
-#include <ctime>
 
 #include "readFile.h"
 #include "ebml.h"
