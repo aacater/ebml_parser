@@ -6,12 +6,20 @@
 //     plans to write the rest
 // TODO:
 //	 was unable to remove opening/closing file from parsing class
-//		I couldn't figure out how to pass ifstream inside the fileName class
+//		I couldn't figure out how to pass ifstream inside the fileName class (needs to be by reference)
 //		keep getting deleted function
-//		maybe write to have file class call the parse class instead of other way around
+//		maybe change it to have readFile class call the parse class instead of other way around
 //		this is only important for optimization/cleanliness
-//	finish parsing differnt ebml element data types
+//	finish parsing differnt ebml element data types (only date left)
 //	add level tracking of element
+//	switch from bare points to unique or shared pointers
+//		only memory allocated is buffer in readFile so probably not very important
+//	add verbose log and otherwise control output
+//		so not always just spammed with the whole file
+//		maybe select parts of the file to parse or by name/id/type
+//	add error/exception handling
+//		currently crashing when try to parse some files
+//		couts when some errors happens but errors not actually handled
 
 #include "parse.h"
 #include "helper.h"
@@ -45,7 +53,7 @@ void parseFile(string fileName)
 	cout << "File size: " << size << " bytes."<< endl;
 
 	int pos = 0;
-	while (true)
+	while (pos < 100)
 	{
 		parse p = parse(fileName, pos); // create new parser object for next ebml element to be parsed
 		p.parseElement(); // parse ebml element
