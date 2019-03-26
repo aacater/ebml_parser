@@ -25,8 +25,8 @@ uint8_t * parse::parseEleSizeorID(bool size)
 	uint8_t * readData;
 
 	if (width != 1)
-	{
-		readData = file.readBits(width, file.getPositionFile() - 1);
+	{ // -1 is offset to have the firstByte included in the returned data
+		readData = file.readBits(width, -1);
 	}
 	else
 	{

@@ -39,15 +39,15 @@ uint8_t * readFile::readBits(int amount)
 }
 
 // read data from file of specific amount of bytes
-// starting at specific position in file
-uint8_t * readFile::readBits(int amount, int posFile)
+// offset is added to current filePosition
+// mainly to have the first id byte in returned data without having to reread it
+uint8_t * readFile::readBits(int amount, int offset)
 {
 	int bufStart = positionBuffer;
-	file.seekg(posFile);
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
-	positionBuffer += amount;
-	positionFile = posFile + amount;
-	return &buffer[bufStart];
+	positionBuffer += (amount + offset);
+	positionFile += (amount + offset);
+	return &buffer[bufStart + offset];
 }
 
 // returns pointer to buffer
@@ -90,6 +90,7 @@ int readFile::getFileSize()
 // zero out buffer
 // prevents acidently reading old data
 // maybe should change to just creating new buffer object?
+// that might create bad memory access though
 void readFile::clearBuffer()
 {
 	for (int i = 0; i < BUFSIZE; i++)

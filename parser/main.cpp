@@ -53,7 +53,7 @@ void parseFile(string fileName)
 	cout << "File size: " << size << " bytes."<< endl;
 
 	int pos = 0;
-	while (pos < 100)
+	while (true)
 	{
 		parse p = parse(fileName, pos); // create new parser object for next ebml element to be parsed
 		p.parseElement(); // parse ebml element
