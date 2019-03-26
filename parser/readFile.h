@@ -18,7 +18,6 @@ private:
 	std::string fileName;
 	std::ifstream file;
 	uint8_t buffer[BUFSIZE];
-	int positionFile; // can also use tellg() but wanted more control
 	int positionBuffer;
 
 public:

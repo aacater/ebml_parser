@@ -11,6 +11,7 @@
 //		maybe change it to have readFile class call the parse class instead of other way around
 //		this is only important for optimization/cleanliness
 //	finish parsing differnt ebml element data types (only date left)
+//	also parse more info about SimpleBlocks/Blocks
 //	add level tracking of element
 //	switch from bare points to unique or shared pointers
 //		only memory allocated is buffer in readFile so probably not very important

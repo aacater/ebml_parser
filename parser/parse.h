@@ -28,7 +28,6 @@ private:
 public:
 	parse(string fileName, int positionFile = 0) : file(fileName), idWidth(1), sizeWidth(1) { file.setPositionBuffer(0); file.clearBuffer(); file.setPositionFile(positionFile); };
 	uint8_t * parseEleSizeorID(bool size = false);
-
 	uint8_t * getID();
 	uint8_t getIDWidth();
 

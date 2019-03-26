@@ -7,7 +7,6 @@ using std::string;
 // open fstream based on file name
 readFile::readFile(string fileName)
 {
-	//std::cout << "Opening file..." << std::endl;
 	file.open(fileName, std::ios::binary | std::ios::in);
 	if (!file.is_open())
 	{
@@ -16,13 +15,11 @@ readFile::readFile(string fileName)
 		system("pause");
 		exit(-1);
 	}
-	//std::cout << "Opened file successfully." << std::endl;
 }
 
 // deconstructor to close file
 readFile::~readFile()
 {
-	//std::cout << "Closing file..." << std::endl;
 	file.close();
 }
 
@@ -30,11 +27,9 @@ readFile::~readFile()
 // should not be greater than BUFSIZE
 uint8_t * readFile::readBits(int amount)
 {
-	file.seekg(positionFile);
 	int bufStart = positionBuffer;
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
 	positionBuffer += amount;
-	positionFile += amount;
 	return &buffer[bufStart];
 }
 
@@ -43,11 +38,11 @@ uint8_t * readFile::readBits(int amount)
 // mainly to have the first id byte in returned data without having to reread it
 uint8_t * readFile::readBits(int amount, int offset)
 {
-	int bufStart = positionBuffer;
+	int bufStart = positionBuffer + offset;
+	amount += offset;
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
-	positionBuffer += (amount + offset);
-	positionFile += (amount + offset);
-	return &buffer[bufStart + offset];
+	positionBuffer += (amount);
+	return &buffer[bufStart];
 }
 
 // returns pointer to buffer
@@ -59,13 +54,13 @@ uint8_t * readFile::getBuffer()
 // returns current position (in bytes) of file
 int readFile::getPositionFile()
 {
-	return positionFile;
+	return file.tellg();
 }
 
 // sets current position (in bytes) of file
 void readFile::setPositionFile(int pos)
 {
-	positionFile = pos;
+	file.seekg(pos);
 }
 
 // returns current position (in bytes) in buffer

@@ -14,8 +14,8 @@ uint8_t * parse::parseEleSizeorID(bool size)
 {
 	int mask = 0x80;
 	int width = 1;
+	
 	uint8_t * firstByte = file.readBits(1); // read first byte
-	//std::cout << "First Byte: 0x" << std::hex << getuint64(firstByte, 1) << std::endl;
 	while (!(firstByte[0] & mask)) 
 	{ // find first zero bit, this shows width
 		mask >>= 1;
