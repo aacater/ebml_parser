@@ -14,8 +14,21 @@ uint8_t * parse::parseEleSizeorID(bool size)
 {
 	int mask = 0x80;
 	int width = 1;
-	
-	uint8_t * firstByte = file.readBits(1); // read first byte
+	uint8_t * firstByte;
+
+	while (true)
+	{
+		firstByte = file.readBits(1); // read first byte
+		if (getuint64(firstByte, 1) == 0)
+		{
+			std::cout << "Element ID can not be zero" << std::endl;
+			file.setPositionFile(file.getPositionFile() + 1);
+			continue;
+		}
+		break;
+	}
+
+
 	while (!(firstByte[0] & mask)) 
 	{ // find first zero bit, this shows width
 		mask >>= 1;
@@ -24,7 +37,7 @@ uint8_t * parse::parseEleSizeorID(bool size)
 
 	uint8_t * readData;
 
-	if (width != 1)
+	if (width > 1)
 	{ // -1 is offset to have the firstByte included in the returned data
 		readData = file.readBits(width, -1);
 	}
@@ -32,7 +45,6 @@ uint8_t * parse::parseEleSizeorID(bool size)
 	{
 		readData = firstByte;
 	}
-
 	if (size)
 	{ // if size == true
 		// then have to remove first zero
@@ -44,7 +56,6 @@ uint8_t * parse::parseEleSizeorID(bool size)
 	{
 		idWidth = width;
 	}
-		
 	return readData;
 }
 
@@ -89,12 +100,20 @@ ebml_element_type parse::getType()
 // parses the id then size of element
 void parse::parseElement()
 {
-	id = parseEleSizeorID(false);
-	size = parseEleSizeorID(true);
-	if (!lookupElement(id, idWidth, name, type))
+	while (true)
 	{
-		name = "UNKNOWN";
+		id = parseEleSizeorID(false);
+		size = parseEleSizeorID(true);
+		if (!lookupElement(id, idWidth, name, type))
+		{
+			std::cout << "EBML Element not found." << std::endl;
+			name = "UNKNOWN";
+			file.setPositionFile(file.getPositionFile() + 1);
+			continue;
+		}
+		break;
 	}
+	
 
 }
 
@@ -137,6 +156,7 @@ void parse::getData(std::ostream & os)
 		return;
 	}
 	uint8_t * data = file.readBits(getuint64(size, sizeWidth));
+	uint8_t dataLength = getuint64(size, sizeWidth);
 	switch (type)
 	{
 	case MASTER:
@@ -152,26 +172,27 @@ void parse::getData(std::ostream & os)
 	}
 	case UINT:
 	{
-		os << std::noshowbase << std::dec << getuint64(data, getuint64(size, sizeWidth));
+		os << std::noshowbase << std::dec << getuint64(data, dataLength);
 		break;
 	}
 	case BINARY:
 	{
 		int dataLength = getuint64(size, sizeWidth);
-		if (dataLength > 32)
-		{ // cap printout at 32 bytes
-			dataLength = 32;
-		}
-		os << std::showbase << std::hex << std::nouppercase << getuint64(data,dataLength);
-		if (dataLength == 32)
+		os << std::showbase << std::hex << std::nouppercase << std::setfill('0');
+		for (int i = 0; i < dataLength; i++)
 		{
-			os << "...";
+			os << std::setw(2) << getuint64(&data[i],1);
+			os << std::noshowbase;
+			if (i > 8)
+			{
+				os << "...";
+				break;
+			}
 		}
 		break;
 	}
 	case FLOAT:
 	{ // can be 4 or 8 bytes long
-		int dataLength = getuint64(size, sizeWidth);
 		if (dataLength != 4 && dataLength != 8)
 			std::cout << "Bad float width.";
 		int64_t temp = int64_t(getuint64(data, dataLength));
@@ -187,7 +208,7 @@ void parse::getData(std::ostream & os)
 	}
 	case INT:
 	{
-		os << std::noshowbase << std::dec << int64_t(getuint64(data, getuint64(size, sizeWidth)));
+		os << std::noshowbase << std::dec << int64_t(getuint64(data, dataLength));
 		break;
 	}
 	default:

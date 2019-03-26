@@ -8,6 +8,7 @@
 #include <fstream>
 #include <ostream>
 #include <string>
+#include  <iomanip>
 
 #include "readFile.h"
 #include "ebml.h"

@@ -19,8 +19,6 @@
 //		so not always just spammed with the whole file
 //		maybe select parts of the file to parse or by name/id/type
 //	add error/exception handling
-//		currently crashing when try to parse some files
-//		couts when some errors happens but errors not actually handled
 
 #include "parse.h"
 #include "helper.h"
@@ -39,7 +37,7 @@ void print(string name, string type, uint8_t * id, uint8_t idWidth, uint8_t * si
 		mask >>= 1;
 	}
 
-	cout << "\n------------------------------------------------\n" << endl;
+	cout << "\n--------------------------------------------------\n" << endl;
 	cout << "(" << std::hex << std::showbase << ( position  )<< ":" << type << ") " << name << " - " << p << endl;
 	cout << std::showbase << std::hex << std::nouppercase;
 	cout << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << endl;
@@ -76,11 +74,18 @@ void parseFile(string fileName)
 int main()
 {
 	// eventually will test all of matroska test files
-	//		test2.mkv crashes
-	//		test7.mkv hangs
+	//		test2.mkv: filePosition goes to -1. it tries to read past the end of the file because a size is too big
+	//		test7.mkv: lots of 0s for IDs. currently just skips until valud id. then tries to read past end of file
 	// https://www.matroska.org/downloads/test_w1.html
 	// and/or take input from user
+	//for (int i = 1; i < 9; i++)
+	//{
+	//	string fileName = "../test files/test" + std::to_string(i) + ".mkv";
+	//	parseFile(fileName); // start parsing file
+	//}
+	
 	string fileName = "../test files/test1.mkv";
 	parseFile(fileName); // start parsing file
+	
 	system("pause"); // stop visual studio from exiting
 }

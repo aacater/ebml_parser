@@ -27,6 +27,12 @@ readFile::~readFile()
 // should not be greater than BUFSIZE
 uint8_t * readFile::readBits(int amount)
 {
+	if (getPositionFile() < 0)
+	{
+		std::cout << "ERROR: Invalid File position. Exiting." << std::endl;
+		system("pause");
+		exit(-1);
+	}
 	int bufStart = positionBuffer;
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
 	positionBuffer += amount;
@@ -38,6 +44,12 @@ uint8_t * readFile::readBits(int amount)
 // mainly to have the first id byte in returned data without having to reread it
 uint8_t * readFile::readBits(int amount, int offset)
 {
+	if (getPositionFile() < 0)
+	{
+		std::cout << "ERROR: Invalid File position. Exiting." << std::endl;
+		system("pause");
+		exit(-1);
+	}
 	int bufStart = positionBuffer + offset;
 	amount += offset;
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
