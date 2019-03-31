@@ -27,7 +27,7 @@ private:
 	enum ebml_element_type type; // ebml element data type
 
 public:
-	parse(string fileName, int positionFile = 0) : file(fileName), idWidth(1), sizeWidth(1) { file.setPositionBuffer(0); file.clearBuffer(); file.setPositionFile(positionFile); };
+	parse(string fileName, int positionFile = 0) : file(fileName), idWidth(1), sizeWidth(1) { file.clearBuffer(); file.setPositionFile(positionFile); };
 	uint8_t * parseEleSizeorID(bool size = false);
 	uint8_t * getID();
 	uint8_t getIDWidth();
@@ -43,6 +43,7 @@ public:
 	int getPositionFile();
 
 	void getData(std::ostream &os);
+	void print(std::ostream &os);
 };
 
 std::ostream& operator<<(std::ostream &os, parse &p);

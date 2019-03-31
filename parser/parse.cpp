@@ -194,7 +194,7 @@ void parse::getData(std::ostream & os)
 	case FLOAT:
 	{ // can be 4 or 8 bytes long
 		if (dataLength != 4 && dataLength != 8)
-			std::cout << "Bad float width.";
+			perror("ERROR: parse::getData: Invalid float dataLength");
 		int64_t temp = int64_t(getuint64(data, dataLength));
 		float float_val = *(float *)(&temp); // pointer magic
 		std::cout << std::fixed << std::dec << float_val;
@@ -213,17 +213,47 @@ void parse::getData(std::ostream & os)
 	}
 	default:
 	{
-		std::cout << "ERROR: Invalid EBML Element Type" << std::endl;
-		exit(-1);
+		perror("ERROR: parse::getData: Invalid EBML element data type");
+		exit(1);
 		break;
 	}
 	}
+}
+
+//print(p.getName(), getebmlTypeName(p.getType()), p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), pos, p);
+//void print(string name, string type, uint8_t * id, uint8_t idWidth, uint8_t * size, uint8_t sizeWidth, int position, parse& p)
+
+void parse::print(std::ostream & os)
+{
+
+	string name = getName();
+	string type = getebmlTypeName(getType());
+	uint8_t * id = getID();
+	uint8_t idWidth = getIDWidth();
+	uint8_t * size = getSize();
+	uint8_t sizeWidth = getSizeWidth();
+	int position = getPositionFile();
+
+
+	int mask = 0x80;
+	for (int i = 1; i < sizeWidth; i++)
+	{ // calculate first byte of size
+		mask >>= 1;
+	}
+
+	os << "\n--------------------------------------------------\n" << std::endl;
+	os << "(" << std::hex << std::showbase << (position) << ":" << type << ") " << name << " - ";
+	getData(os);
+	os << std::endl;
+	os << std::showbase << std::hex << std::nouppercase;
+	os << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << std::endl;
+	os << "Element Size: " << std::dec << getuint64(size, sizeWidth) << " (" << std::showbase << std::hex << (size[0] ^ mask) << " with width " << std::noshowbase << std::dec << getuint64(&sizeWidth) << ")" << std::endl;
 }
 
 // overloads parse class object to << operator.
 // used to print data to ostream
 ostream& operator<<(ostream &os, parse &p)
 {
-	p.getData(os);
+	p.print(os);
 	return os;
 }

@@ -10,10 +10,9 @@ readFile::readFile(string fileName)
 	file.open(fileName, std::ios::binary | std::ios::in);
 	if (!file.is_open())
 	{
-		std::cout << "ERROR: Can not open file: " << fileName << std::endl;
-		std::cout << "Exiting..." << std::endl;
+		perror("ERROR: readFile::readFile: Cannot open file");
 		system("pause");
-		exit(-1);
+		exit(1);
 	}
 }
 
@@ -29,9 +28,9 @@ uint8_t * readFile::readBits(int amount)
 {
 	if (getPositionFile() < 0)
 	{
-		std::cout << "ERROR: Invalid File position. Exiting." << std::endl;
+		perror("ERROR: readFile::readBits: Invalid file position");
 		system("pause");
-		exit(-1);
+		exit(1);
 	}
 	int bufStart = positionBuffer;
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
@@ -46,21 +45,15 @@ uint8_t * readFile::readBits(int amount, int offset)
 {
 	if (getPositionFile() < 0)
 	{
-		std::cout << "ERROR: Invalid File position. Exiting." << std::endl;
+		perror("ERROR: readFile::readBits: Invalid file position");
 		system("pause");
-		exit(-1);
+		exit(1);
 	}
 	int bufStart = positionBuffer + offset;
 	amount += offset;
 	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
 	positionBuffer += (amount);
 	return &buffer[bufStart];
-}
-
-// returns pointer to buffer
-uint8_t * readFile::getBuffer()
-{
-	return (uint8_t *)buffer;
 }
 
 // returns current position (in bytes) of file
@@ -73,18 +66,6 @@ int readFile::getPositionFile()
 void readFile::setPositionFile(int pos)
 {
 	file.seekg(pos);
-}
-
-// returns current position (in bytes) in buffer
-int readFile::getPositionBuffer()
-{
-	return positionBuffer;
-}
-
-// sets current position (in bytes) of file
-void readFile::setPositionBuffer(int pos)
-{
-	positionBuffer = pos;
 }
 
 // returns size of file (in bytes)
@@ -100,8 +81,10 @@ int readFile::getFileSize()
 // that might create bad memory access though
 void readFile::clearBuffer()
 {
+	positionBuffer = 0;
 	for (int i = 0; i < BUFSIZE; i++)
 	{
 		buffer[i] = 0;
 	}
+
 }

@@ -19,6 +19,7 @@
 //		so not always just spammed with the whole file
 //		maybe select parts of the file to parse or by name/id/type
 //	add error/exception handling
+//	when printing the position of end of element is printed not start
 
 #include "parse.h"
 #include "helper.h"
@@ -27,22 +28,6 @@
 using std::string;
 using std::cout;
 using std::endl;
-
-// print parsed info about an ebml element
-void print(string name, string type, uint8_t * id, uint8_t idWidth, uint8_t * size, uint8_t sizeWidth, int position, parse& p)
-{
-	int mask = 0x80;
-	for (int i = 1; i < sizeWidth; i++)
-	{ // calculate first byte of size
-		mask >>= 1;
-	}
-
-	cout << "\n--------------------------------------------------\n" << endl;
-	cout << "(" << std::hex << std::showbase << ( position  )<< ":" << type << ") " << name << " - " << p << endl;
-	cout << std::showbase << std::hex << std::nouppercase;
-	cout << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << endl;
-	cout << "Element Size: " << std::dec << getuint64(size, sizeWidth) << " (" << std::showbase << std::hex << (size[0] ^ mask) << " with width "  << std::noshowbase << std::dec << getuint64(&sizeWidth) << ")" << endl;
-}
 
 // parses one ebml element at a time from file
 void parseFile(string fileName)
@@ -57,9 +42,7 @@ void parseFile(string fileName)
 		parse p = parse(fileName, pos); // create new parser object for next ebml element to be parsed
 		p.parseElement(); // parse ebml element
 
-		string typeName = getebmlTypeName(p.getType()); // find string of ebml type
-		string name = p.getName(); // get ebml element name
-		print(name, typeName, p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), pos, p); // print parsed info to cout
+		cout << p << endl;
 		
 		pos = p.getPositionFile(); // update position counter
 
