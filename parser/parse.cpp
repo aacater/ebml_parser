@@ -59,44 +59,6 @@ uint8_t * parse::parseEleSizeorID(bool size)
 	return readData;
 }
 
-// returns pointer to id
-uint8_t * parse::getID()
-{
-	return id;
-}
-
-// returns uint8_t of width of ID
-// can be between 1 and 4
-uint8_t parse::getIDWidth()
-{
-	return idWidth;
-}
-
-// returns pointer to size
-uint8_t * parse::getSize()
-{
-	return size;
-}
-
-// returns uint8_t of width of Size
-// can be between 1 and 8
-uint8_t parse::getSizeWidth()
-{
-	return sizeWidth;
-}
-
-// returns name of EBML element
-string parse::getName()
-{
-	return name;
-}
-
-// turns type of type of EBML element
-ebml_element_type parse::getType()
-{
-	return type;
-}
-
 // parses the id then size of element
 void parse::parseElement()
 {
@@ -220,20 +182,11 @@ void parse::getData(std::ostream & os)
 	}
 }
 
-//print(p.getName(), getebmlTypeName(p.getType()), p.getID(), p.getIDWidth(), p.getSize(), p.getSizeWidth(), pos, p);
-//void print(string name, string type, uint8_t * id, uint8_t idWidth, uint8_t * size, uint8_t sizeWidth, int position, parse& p)
-
+// prints id, size, type and other data to ostream
 void parse::print(std::ostream & os)
 {
-
-	string name = getName();
-	string type = getebmlTypeName(getType());
-	uint8_t * id = getID();
-	uint8_t idWidth = getIDWidth();
-	uint8_t * size = getSize();
-	uint8_t sizeWidth = getSizeWidth();
+	// this position is start of ebml data (after id/size) because id and size have been read but data has not yet.
 	int position = getPositionFile();
-
 
 	int mask = 0x80;
 	for (int i = 1; i < sizeWidth; i++)
@@ -242,7 +195,7 @@ void parse::print(std::ostream & os)
 	}
 
 	os << "\n--------------------------------------------------\n" << std::endl;
-	os << "(" << std::hex << std::showbase << (position) << ":" << type << ") " << name << " - ";
+	os << "(" << std::hex << std::showbase << (position) << ":" << getebmlTypeName(type) << ") " << name << " - ";
 	getData(os);
 	os << std::endl;
 	os << std::showbase << std::hex << std::nouppercase;

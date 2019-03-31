@@ -24,8 +24,7 @@ public:
 	readFile() {};
 	readFile(std::string fileName);
 	~readFile();
-	uint8_t * readBits(int amount);
-	uint8_t * readBits(int amount, int offset);
+	uint8_t * readBits(int amount, int offset = 0);
 	int getPositionFile();
 	void setPositionFile(int pos);
 	int getFileSize();

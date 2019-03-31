@@ -23,22 +23,6 @@ readFile::~readFile()
 }
 
 // read data from file of specific amount of bytes
-// should not be greater than BUFSIZE
-uint8_t * readFile::readBits(int amount)
-{
-	if (getPositionFile() < 0)
-	{
-		perror("ERROR: readFile::readBits: Invalid file position");
-		system("pause");
-		exit(1);
-	}
-	int bufStart = positionBuffer;
-	file.read(reinterpret_cast<char*>(&buffer[positionBuffer]), amount);
-	positionBuffer += amount;
-	return &buffer[bufStart];
-}
-
-// read data from file of specific amount of bytes
 // offset is added to current filePosition
 // mainly to have the first id byte in returned data without having to reread it
 uint8_t * readFile::readBits(int amount, int offset)
