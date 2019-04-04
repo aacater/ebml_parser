@@ -8,7 +8,7 @@
 #include <fstream>
 #include <ostream>
 #include <string>
-#include  <iomanip>
+#include <iomanip>
 
 #include "readFile.h"
 #include "ebml.h"
@@ -16,7 +16,6 @@
 class parse {
 private:
 	readFile file; // file to parse from
-	string fileName; // name of file to parse from
 
 	uint8_t idWidth; // specifies ID length
 	uint8_t sizeWidth; // specifies size length
@@ -40,5 +39,6 @@ public:
 };
 
 std::ostream& operator<<(std::ostream &os, parse &p);
+uint64_t getuint64(uint8_t* data, int length = 1);
 
 #endif

@@ -9,8 +9,6 @@
 #include <fstream>
 #include <string>
 
-#include "helper.h"
-
 #define BUFSIZE 104857
 
 class readFile {

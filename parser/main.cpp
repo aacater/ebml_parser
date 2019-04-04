@@ -22,7 +22,6 @@
 //	when printing the position of end of element is printed not start
 
 #include "parse.h"
-#include "helper.h"
 #include "ebml.h"
 
 using std::string;
