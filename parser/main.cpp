@@ -67,6 +67,8 @@ int main()
 	//}
 	
 	string fileName = "../test files/test1.mkv";
+
+
 	parseFile(fileName); // start parsing file
 	
 	system("pause"); // stop visual studio from exiting

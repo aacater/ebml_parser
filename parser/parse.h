@@ -15,15 +15,15 @@
 
 class parse {
 private:
-	readFile file; // file to parse from
+	readFile file;					 // file to parse from
 
-	uint8_t idWidth; // specifies ID length
-	uint8_t sizeWidth; // specifies size length
-	uint8_t * id; // id can be maximum length of 4 bytes 
-	uint8_t * size; // size can be maximum length of 8 bytes
+	uint8_t idWidth;				// specifies ID length
+	uint8_t sizeWidth;				// specifies size length
+	uint8_t * id;					// id can be maximum length of 4 bytes 
+	uint8_t * size;					// size can be maximum length of 8 bytes
 
-	std::string name; // ebml element name
-	enum ebml_element_type type; // ebml element data type
+	std::string name;				// ebml element name
+	enum ebml_element_type type;	// ebml element data type
 
 public:
 	parse(string fileName, int positionFile = 0) : file(fileName), idWidth(1), sizeWidth(1) { file.clearBuffer(); file.setPositionFile(positionFile); };
