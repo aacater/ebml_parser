@@ -43,6 +43,12 @@ void parseFile(const string& inputFile, const string& outputFile)
 
 	std::ofstream outFile;
 	outFile.open(outputFile, fstream::app);
+	if (!outFile.is_open())
+	{
+		perror("ERROR: main::parseFile: Cannot open file");
+		system("pause");
+		exit(1);
+	}
 
 	int pos = 0;
 	while (true)
@@ -75,16 +81,16 @@ int main()
 	//	parseFile(fileName); // start parsing file
 	//}
 	
-	string inputFile = "../test files/test1.mkv";
-	string outputFile = "../output.txt";
+	string inputFileName = "../test files/test1.mkv";
+	string outputFileName = "../output.txt";
 
 	ofstream outFile;
-	outFile.open(outputFile);
+	outFile.open(outputFileName);
 	
 	if (outFile.is_open())
 	{
 		outFile.close();
-		parseFile(inputFile, outputFile); // start parsing file
+		parseFile(inputFileName, outputFileName); // start parsing file
 	}
 	else
 	{

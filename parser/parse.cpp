@@ -127,7 +127,7 @@ void parse::getData(std::ostream & os)
 		os << "N/A";
 		break;
 	}
-	case UTF8:
+	case UTF8: // parsed the same
 	case STRING:
 	{
 		os << std::noshowbase << std::hex << std::nouppercase << data;
@@ -173,11 +173,13 @@ void parse::getData(std::ostream & os)
 		ss >> time_in_nanosec;
 		time_in_nanosec += 978307200; // nanoseconds between unix epoch (1970-01-01) and start of millennium (2001-01-01)
 
-		//struct tm * timeStruct = _gmtime64_s(&time_in_nanosec);
+		time_t t = time_in_nanosec;
+		struct tm buf;
+		int dateerror = gmtime_s(&buf, &t);
 
 		char dateString[80];
 		// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
-		//strftime(dateString, sizeof(dateString), "%a %b %d, %Y @ %H:%M:%S", timeStruct);
+		strftime(dateString, sizeof(dateString), "%a %b %d, %Y @ %H:%M:%S", &buf);
 
 		os << dateString;
 

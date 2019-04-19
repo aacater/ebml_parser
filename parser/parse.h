@@ -10,6 +10,7 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <time.h>
 
 #include "readFile.h"
 #include "ebml.h"

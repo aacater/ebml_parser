@@ -132,7 +132,7 @@ Element Size: 123 (0xfb with width 1)
 
 --------------------------------------------------
 
-(0x118:DATE) DateUTC - 
+(0x118:DATE) DateUTC - Sat Aug 21, 2010 @ 07:23:03
 Element ID: 0x4461 of width 2
 Element Size: 8 (0x88 with width 1)
 
