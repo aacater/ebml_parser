@@ -24,25 +24,34 @@
 #include "parse.h"
 #include "ebml.h"
 
+#include <fstream>
+using std::fstream;
+using std::ofstream;
+
 using std::string;
 using std::cout;
 using std::endl;
 
 // parses one ebml element at a time from file
-void parseFile(string fileName)
+void parseFile(const string& inputFile, const string& outputFile)
 {
-	readFile file = readFile(fileName);
+	readFile file = readFile(inputFile);
 	int size = file.getFileSize();
 	cout << "File size: " << size << " bytes."<< endl;
+
+	cout << endl << "Parsing file..." << endl;
+
+	std::ofstream outFile;
+	outFile.open(outputFile, fstream::app);
 
 	int pos = 0;
 	while (true)
 	{
-		parse p = parse(fileName, pos); // create new parser object for next ebml element to be parsed
+		parse p = parse(inputFile, pos); // create new parser object for next ebml element to be parsed
 		p.parseElement(); // parse ebml element
-
-		cout << p << endl;
 		
+		outFile << p << endl;
+
 		pos = p.getPositionFile(); // update position counter
 
 		if (pos == size)
@@ -66,10 +75,19 @@ int main()
 	//	parseFile(fileName); // start parsing file
 	//}
 	
-	string fileName = "../test files/test1.mkv";
+	string inputFile = "../test files/test1.mkv";
+	string outputFile = "../output.txt";
 
-
-	parseFile(fileName); // start parsing file
+	ofstream outFile;
+	outFile.open(outputFile);
 	
-	system("pause"); // stop visual studio from exiting
+	if (outFile.is_open())
+	{
+		outFile.close();
+		parseFile(inputFile, outputFile); // start parsing file
+	}
+	else
+	{
+		perror("ERROR: main: Unable to open file");
+	}
 }

@@ -5,6 +5,8 @@
 
 using std::string;
 using std::ostream;
+using std::fstream;
+using std::stringstream;
 
 // read the first byte and find the length of data
 // class specifies the length of the data piece 
@@ -27,7 +29,6 @@ uint8_t * parse::parseEleSizeorID(bool size)
 		}
 		break;
 	}
-
 
 	while (!(firstByte[0] & mask)) 
 	{ // find first zero bit, this shows width
@@ -159,13 +160,27 @@ void parse::getData(std::ostream & os)
 			perror("ERROR: parse::getData: Invalid float dataLength");
 		int64_t temp = int64_t(getuint64(data, dataLength));
 		float float_val = *(float *)(&temp); // pointer magic
-		std::cout << std::fixed << std::dec << float_val;
+		os << std::fixed << std::dec << float_val;
 		break;
 	}
-	case DATE: // TO DO
-	{ // 8 byte integer in nanosecods
+	case DATE:
+	{	// 8 byte integer in nanosecods
 		// 0 indicating the precise beginning of the millennium
 		
+		stringstream ss;
+		time_t time_in_nanosec;
+		ss << std::dec << getuint64(data, dataLength) / 1000000000; // convert to seconds
+		ss >> time_in_nanosec;
+		time_in_nanosec += 978307200; // nanoseconds between unix epoch (1970-01-01) and start of millennium (2001-01-01)
+
+		//struct tm * timeStruct = _gmtime64_s(&time_in_nanosec);
+
+		char dateString[80];
+		// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
+		//strftime(dateString, sizeof(dateString), "%a %b %d, %Y @ %H:%M:%S", timeStruct);
+
+		os << dateString;
+
 		break;
 	}
 	case INT:
@@ -194,7 +209,7 @@ void parse::print(std::ostream & os)
 		mask >>= 1;
 	}
 
-	os << "\n--------------------------------------------------\n" << std::endl;
+	os << "--------------------------------------------------\n" << std::endl;
 	os << "(" << std::hex << std::showbase << (position) << ":" << getebmlTypeName(type) << ") " << name << " - ";
 	getData(os);
 	os << std::endl;

@@ -9,6 +9,7 @@
 #include <ostream>
 #include <string>
 #include <iomanip>
+#include <sstream>
 
 #include "readFile.h"
 #include "ebml.h"
@@ -16,6 +17,7 @@
 class parse {
 private:
 	readFile file;					 // file to parse from
+	string log;
 
 	uint8_t idWidth;				// specifies ID length
 	uint8_t sizeWidth;				// specifies size length
