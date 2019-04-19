@@ -24,6 +24,10 @@
 #include "helper.h"
 #include "ebml.h"
 
+#include <fstream>
+using std::fstream;
+using std::ofstream;
+
 using std::string;
 using std::cout;
 using std::endl;
@@ -37,24 +41,34 @@ void print(string name, string type, uint8_t * id, uint8_t idWidth, uint8_t * si
 		mask >>= 1;
 	}
 
-	cout << "\n--------------------------------------------------\n" << endl;
-	cout << "(" << std::hex << std::showbase << ( position  )<< ":" << type << ") " << name << " - " << p << endl;
-	cout << std::showbase << std::hex << std::nouppercase;
-	cout << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << endl;
-	cout << "Element Size: " << std::dec << getuint64(size, sizeWidth) << " (" << std::showbase << std::hex << (size[0] ^ mask) << " with width "  << std::noshowbase << std::dec << getuint64(&sizeWidth) << ")" << endl;
+    std::ofstream outFile;
+    outFile.open("../output.txt", fstream::app);
+
+    outFile << "\n--------------------------------------------------\n" << endl;
+    outFile << "(" << std::hex << std::showbase << ( position  )<< ":" << type << ") " << name << " - " << p << endl;
+    outFile << std::showbase << std::hex << std::nouppercase;
+    outFile << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << endl;
+    outFile << "Element Size: " << std::dec << getuint64(size, sizeWidth) << " (" << std::showbase << std::hex << (size[0] ^ mask) << " with width "  << std::noshowbase << std::dec << getuint64(&sizeWidth) << ")" << endl;
+
+    outFile.close();
 }
 
 // parses one ebml element at a time from file
-void parseFile(string fileName)
+void parseFile(string inputFile, string outputFile)
 {
-	readFile file = readFile(fileName);
+    cout << endl << "Parsing file..." << endl;
+
+    readFile file(inputFile);
 	int size = file.getFileSize();
-	cout << "File size: " << size << " bytes."<< endl;
+
+	std::ofstream outFile;
+	outFile.open(outputFile, fstream::app);
+	outFile << endl << "File size: " << size << " bytes."<< endl;
 
 	int pos = 0;
 	while (true)
 	{
-		parse p = parse(fileName, pos); // create new parser object for next ebml element to be parsed
+		parse p(inputFile, pos); // create new parser object for next ebml element to be parsed
 		p.parseElement(); // parse ebml element
 
 		string typeName = getebmlTypeName(p.getType()); // find string of ebml type
@@ -80,12 +94,18 @@ int main()
 	// and/or take input from user
 	//for (int i = 1; i < 9; i++)
 	//{
-	//	string fileName = "../test files/test" + std::to_string(i) + ".mkv";
-	//	parseFile(fileName); // start parsing file
+	//	string inputFile = "../test files/test" + std::to_string(i) + ".mkv";
+	//	parseFile(inputFile); // start parsing file
 	//}
 	
-	string fileName = "../test files/test1.mkv";
-	parseFile(fileName); // start parsing file
-	
+	string inputFile = "../test files/test1.mkv";
+	string outputFile = "../output.txt";
+
+	ofstream outFile;
+	outFile.open(outputFile);
+	outFile.close();
+
+	parseFile(inputFile, outputFile); // start parsing file
+
 	system("pause"); // stop visual studio from exiting
 }

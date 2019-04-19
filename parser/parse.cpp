@@ -3,6 +3,8 @@
 
 #include "parse.h"
 
+#include "time.h"
+
 using std::string;
 using std::ostream;
 
@@ -197,13 +199,26 @@ void parse::getData(std::ostream & os)
 			std::cout << "Bad float width.";
 		int64_t temp = int64_t(getuint64(data, dataLength));
 		float float_val = *(float *)(&temp); // pointer magic
-		std::cout << std::fixed << std::dec << float_val;
+		os << std::fixed << std::dec << float_val;
 		break;
 	}
-	case DATE: // TO DO
+	case DATE:
 	{ // 8 byte integer in nanosecods
 		// 0 indicating the precise beginning of the millennium
-		
+
+		std::stringstream ss;
+		time_t time_in_nanosec;
+		ss << std::dec << getuint64(data,dataLength)/1000000000;
+		ss >> time_in_nanosec;
+		time_in_nanosec += 978307200;
+
+		struct tm * timeStruct = gmtime(&time_in_nanosec);
+
+		char dateString[80];
+		// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
+		strftime(dateString, sizeof(dateString), "%a %b %d, %Y @ %H:%M:%S", timeStruct);
+
+        os << dateString;
 		break;
 	}
 	case INT:
