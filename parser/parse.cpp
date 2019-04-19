@@ -175,7 +175,8 @@ void parse::getData(std::ostream & os)
 
 		time_t t = time_in_nanosec;
 		struct tm buf;
-		int dateerror = gmtime_s(&buf, &t);
+		int dateerror = gmtime_s(&buf, &t); // might only work on windows. 
+		//struct tm * buf = gmtime(&time_in_nanosec); // works on linux
 
 		char dateString[80];
 		// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"
