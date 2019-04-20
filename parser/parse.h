@@ -19,7 +19,6 @@
 class parse {
 private:
 	int fileSize;						 // size of file to parse
-	string log;
 	std::shared_ptr<uint8_t> buffer;	// pointer to buffer to store data
 	int positionBuffer;					// current position in buffer
 
@@ -46,6 +45,5 @@ public:
 };
 
 std::ostream& operator<<(std::ostream &os, parse &p);
-uint64_t getuint64(std::shared_ptr<uint8_t> data, int length = 1);
 uint64_t getuint64(uint8_t * data, int length = 1);
 #endif

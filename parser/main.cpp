@@ -22,7 +22,7 @@ using std::endl;
 // parses one ebml element at a time from file
 void parseFile(const string& inputFileName, const string& outputFileName)
 {
-	//cout << endl << "Parsing file..." << endl;
+	cout << endl << "Parsing file..." << endl;
 
 	std::ofstream outFile;
 	outFile.open(outputFileName, fstream::trunc);

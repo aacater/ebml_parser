@@ -8,6 +8,7 @@ using std::ostream;
 using std::stringstream;
 using std::shared_ptr;
 
+// reads file contents into memory
 parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(0), id(nullptr), size(nullptr), type(MASTER)
 {
 	std::ifstream file;
@@ -17,8 +18,7 @@ parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(
 	fileSize = file.tellg();
 	file.seekg(0);
 
-	//char* pointer = reinterpret_cast<char*>(malloc(fileSize));
-	char* pointer = new char[fileSize];
+	char* pointer = reinterpret_cast<char*>(malloc(fileSize));
 	file.read(pointer, fileSize);
 	
 	shared_ptr<uint8_t> temp(reinterpret_cast<uint8_t*>(pointer));
