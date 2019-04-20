@@ -5,47 +5,54 @@
 
 using std::string;
 using std::ostream;
-using std::fstream;
 using std::stringstream;
+using std::shared_ptr;
+
+parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(0), id(nullptr), size(nullptr), type(MASTER)
+{
+	std::ifstream file;
+	file.open(fileName, std::ios::binary | std::ios::in);
+
+	file.seekg(0, file.end);
+	fileSize = file.tellg();
+	file.seekg(0);
+
+	//char* pointer = reinterpret_cast<char*>(malloc(fileSize));
+	char* pointer = new char[fileSize];
+	file.read(pointer, fileSize);
+	
+	shared_ptr<uint8_t> temp(reinterpret_cast<uint8_t*>(pointer));
+	buffer.swap(temp);
+	file.close();
+}
 
 // read the first byte and find the length of data
 // class specifies the length of the data piece 
 // then read data based on length
 // returns pointer to data
-uint8_t * parse::parseEleSizeorID(bool size)
+uint8_t* parse::parseEleSizeorID(bool size)
 {
 	int mask = 0x80;
 	int width = 1;
-	uint8_t * firstByte;
 
 	while (true)
 	{
-		firstByte = file.readBits(1); // read first byte
-		if (getuint64(firstByte, 1) == 0)
+		if (getuint64(buffer.get(), 1) == 0)
 		{
 			std::cout << "Element ID can not be zero" << std::endl;
-			file.setPositionFile(file.getPositionFile() + 1);
+			positionBuffer += 1;
 			continue;
 		}
 		break;
 	}
 
-	while (!(firstByte[0] & mask)) 
+	while (!(buffer.get()[positionBuffer] & mask)) 
 	{ // find first zero bit, this shows width
 		mask >>= 1;
 		width++;
 	}
 
-	uint8_t * readData;
-
-	if (width > 1)
-	{ // -1 is offset to have the firstByte included in the returned data
-		readData = file.readBits(width, -1);
-	}
-	else
-	{
-		readData = firstByte;
-	}
+	uint8_t* readData = &buffer.get()[positionBuffer];
 	if (size)
 	{ // if size == true
 		// then have to remove first zero
@@ -57,6 +64,7 @@ uint8_t * parse::parseEleSizeorID(bool size)
 	{
 		idWidth = width;
 	}
+	positionBuffer += width;
 	return readData;
 }
 
@@ -69,19 +77,17 @@ void parse::parseElement()
 		size = parseEleSizeorID(true);
 		if (!lookupElement(id, idWidth, name, type))
 		{
-			std::cout << "EBML Element not found." << std::endl;
+			std::cout << "EBML Element not found. Position: " << std::hex << std::showbase << positionBuffer << std::endl;
 			name = "UNKNOWN";
-			file.setPositionFile(file.getPositionFile() + 1);
+			positionBuffer += 1;
 			continue;
 		}
 		break;
 	}
-	
-
 }
 
 // uses the id to lookup the Element Name and Type from list
-bool parse::lookupElement(uint8_t * const& id, const int& width, std::string& name, ebml_element_type& type)
+bool parse::lookupElement(uint8_t* const& id, const int& width, std::string& name, ebml_element_type& type)
 {
 	bool found = false;
 	for (int i = 0; i < SPEC_LEN; i++)
@@ -89,7 +95,10 @@ bool parse::lookupElement(uint8_t * const& id, const int& width, std::string& na
 		for (int j = 0; j < width; j++)
 		{ // check each byte of ID
 			if (ebml_spec[i]->id[j] != id[j])
+			{
+				//std::cout << std::hex << getuint64(&id.get()[j]) << " AND " << ebml_spec[i]->id[j] << std::endl;
 				break;
+			}
 			if(width - 1 == j)
 				found = true;
 		} // if found stop looking
@@ -104,9 +113,15 @@ bool parse::lookupElement(uint8_t * const& id, const int& width, std::string& na
 }
 
 // returns current position (in bytes) of file
-int parse::getPositionFile()
+int parse::getPosition()
 {
-	return file.getPositionFile();
+	return positionBuffer;
+}
+
+// returns size of file
+int parse::getSize()
+{
+	return fileSize;
 }
 
 // prints ebml element data based on element type to ostream 
@@ -118,7 +133,8 @@ void parse::getData(std::ostream & os)
 		os << "N/A";
 		return;
 	}
-	uint8_t * data = file.readBits(getuint64(size, sizeWidth));
+	//uint8_t* data = getuint64(size, sizeWidth));
+	uint8_t* data = &buffer.get()[positionBuffer];
 	uint8_t dataLength = getuint64(size, sizeWidth);
 	switch (type)
 	{
@@ -130,7 +146,8 @@ void parse::getData(std::ostream & os)
 	case UTF8: // parsed the same
 	case STRING:
 	{
-		os << std::noshowbase << std::hex << std::nouppercase << data;
+		std::string str(data, data + dataLength); // substring
+		os << std::noshowbase << std::hex << std::nouppercase << str;
 		break;
 	}
 	case UINT:
@@ -140,7 +157,6 @@ void parse::getData(std::ostream & os)
 	}
 	case BINARY:
 	{
-		int dataLength = getuint64(size, sizeWidth);
 		os << std::showbase << std::hex << std::nouppercase << std::setfill('0');
 		for (int i = 0; i < dataLength; i++)
 		{
@@ -198,27 +214,27 @@ void parse::getData(std::ostream & os)
 		break;
 	}
 	}
+	positionBuffer += (int)getuint64(size, sizeWidth);
 }
 
 // prints id, size, type and other data to ostream
 void parse::print(std::ostream & os)
 {
-	// this position is start of ebml data (after id/size) because id and size have been read but data has not yet.
-	int position = getPositionFile();
+	int pos = positionBuffer;
+	parseElement();
 
 	int mask = 0x80;
 	for (int i = 1; i < sizeWidth; i++)
 	{ // calculate first byte of size
 		mask >>= 1;
 	}
-
-	os << "--------------------------------------------------\n" << std::endl;
-	os << "(" << std::hex << std::showbase << (position) << ":" << getebmlTypeName(type) << ") " << name << " - ";
+	os << "(" << std::hex << std::showbase << pos << ":" << getebmlTypeName(type) << ") " << name << " - ";
 	getData(os);
 	os << std::endl;
 	os << std::showbase << std::hex << std::nouppercase;
 	os << "Element ID: " << getuint64(id, idWidth) << " of width " << std::noshowbase << getuint64(&idWidth) << std::endl;
 	os << "Element Size: " << std::dec << getuint64(size, sizeWidth) << " (" << std::showbase << std::hex << (size[0] ^ mask) << " with width " << std::noshowbase << std::dec << getuint64(&sizeWidth) << ")" << std::endl;
+	os << "\n--------------------------------------------------\n" << std::endl;
 }
 
 // overloads parse class object to << operator.
@@ -231,7 +247,7 @@ ostream& operator<<(ostream &os, parse &p)
 
 // returns a uint64_t made from data of variable length starting at passed pointer
 // converts from big endian to little endian 
-uint64_t getuint64(uint8_t* data, int length)
+uint64_t getuint64(uint8_t * data, int length)
 {
 	uint64_t value = 0;
 	value = data[length - 1];

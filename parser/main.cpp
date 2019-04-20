@@ -9,45 +9,35 @@
 //	switch from bare points to unique or shared pointers
 //		only memory allocated is buffer in readFile so probably not very important
 //	add (more) error/exception handling
-//	when printing the position of end of element id/size is printed not start
 
 #include "parse.h"
 #include "ebml.h"
 
 using std::fstream;
 using std::ofstream;
-
 using std::string;
 using std::cout;
 using std::endl;
 
 // parses one ebml element at a time from file
-void parseFile(const string& inputFile, const string& outputFile)
+void parseFile(const string& inputFileName, const string& outputFileName)
 {
-	readFile file = readFile(inputFile);
-	int size = file.getFileSize();
-	cout << "File size: " << size << " bytes."<< endl;
-
-	cout << endl << "Parsing file..." << endl;
+	//cout << endl << "Parsing file..." << endl;
 
 	std::ofstream outFile;
-	outFile.open(outputFile, fstream::app);
+	outFile.open(outputFileName, fstream::trunc);
 	if (!outFile.is_open())
 	{
-		perror("ERROR: main::parseFile: Cannot open file");
-		system("pause");
-		exit(1);
+		perror("ERROR: main: Unable to open file");
 	}
+	parse p = parse(inputFileName);
+	int size = p.getSize();
 
 	int pos = 0;
 	while (true)
 	{
-		parse p = parse(inputFile, pos); // create new parser object for next ebml element to be parsed
-		p.parseElement(); // parse ebml element
-		
-		outFile << p << endl;
-
-		pos = p.getPositionFile(); // update position counter
+		outFile << p; // parse and print data from file
+		pos = p.getPosition(); // update position counter
 
 		if (pos == size)
 		{
@@ -55,6 +45,7 @@ void parseFile(const string& inputFile, const string& outputFile)
 			break;
 		}
 	}
+	outFile.close();
 }
 
 int main()
@@ -74,16 +65,7 @@ int main()
 	string inputFileName = "../test files/test1.mkv";
 	string outputFileName = "../output.txt";
 
-	ofstream outFile;
-	outFile.open(outputFileName);
-	
-	if (outFile.is_open())
-	{
-		outFile.close();
-		parseFile(inputFileName, outputFileName); // start parsing file
-	}
-	else
-	{
-		perror("ERROR: main: Unable to open file");
-	}
+	parseFile(inputFileName, outputFileName); // start parsing file
+
+	return 0;
 }
