@@ -5,14 +5,11 @@ This program allowed us to learn about the structure of ebml files, which is sim
 
 ## Related Links
 
-[Matroska specifications]
-(https://matroska.org/technical/specs/index.html)
+[Matroska specifications](https://matroska.org/technical/specs/index.html)
 
-[Some more matroska specifications]
-(https://matroska-org.github.io/libebml/specs.html)
+[Some more matroska specifications](https://matroska-org.github.io/libebml/specs.html)
 
-[mkv files was found here]
-(https://github.com/Matroska-Org/matroska-test-files/tree/master/test_files)
+[mkv files was found here](https://github.com/Matroska-Org/matroska-test-files/tree/master/test_files)
 
 ## ebml Types
 The possible types of elements in the mkv file are:
