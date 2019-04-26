@@ -11,8 +11,13 @@ using std::shared_ptr;
 // reads file contents into memory
 parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(0), id(nullptr), size(nullptr), type(MASTER)
 {
+	std::cout << "Reading from media file" << std::endl;
 	std::ifstream file;
 	file.open(fileName, std::ios::binary | std::ios::in);
+	if (!file.is_open())
+	{
+		perror("ERROR: main: Unable to open file");
+	}
 
 	file.seekg(0, file.end);
 	fileSize = file.tellg();
