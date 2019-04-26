@@ -13,13 +13,14 @@
 #include <time.h>
 #include <memory>
 #include <stdlib.h> 
+#include <windows.h>
 
 #include "ebml.h"
 
 class parse {
 private:
-	int fileSize;						 // size of file to parse
 	std::shared_ptr<uint8_t> buffer;	// pointer to buffer to store data
+	int fileSize;						 // size of file to parse
 	int positionBuffer;					// current position in buffer
 
 	uint8_t idWidth;					// specifies ID length
@@ -32,6 +33,7 @@ private:
 
 public:
 	parse(const std::string& fileName);
+	~parse();
 
 	uint8_t* parseEleSizeorID(bool size = false);
 	void parseElement();

@@ -16,20 +16,49 @@ parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(
 	file.open(fileName, std::ios::binary | std::ios::in);
 	if (!file.is_open())
 	{
-		perror("ERROR: main: Unable to open file");
+		perror("ERROR: parse::parse: Unable to open file");
 	}
 
 	file.seekg(0, file.end);
 	fileSize = file.tellg();
 	file.seekg(0);
 
-	char* pointer = reinterpret_cast<char*>(malloc(fileSize)); // allocate enough buffer for whole file
-	//char* pointer = reinterpret_cast<char*>(mmap(nullptr,fileSize, PROT_READ | PROT_WRITE, MAP_PRIVATE, -1, 0));
+	//char* pointer = reinterpret_cast<char*>(malloc(fileSize)); // allocate enough buffer for whole file
+
+	HANDLE h = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0u, fileSize, nullptr);
+	if (h == NULL)
+	{
+		perror("ERROR: parse::parse: invalid pointer");
+		std::cout << GetLastError() << std::endl;
+		exit(-1);
+	}
+
+	char* pointer = reinterpret_cast<char*>(MapViewOfFile(h, FILE_MAP_WRITE, 0, 0, fileSize));
+	if (pointer == nullptr || pointer == (void*)-1)
+	{
+		perror("ERROR: parse::parse: invalid pointer");
+		std::cout << GetLastError() << std::endl;
+	}
+
 	file.read(pointer, fileSize); // read file into buffer
-	
-	shared_ptr<uint8_t> temp(reinterpret_cast<uint8_t*>(pointer));
+
+
+	auto deleter = [](uint8_t * p) {
+		std::cout << "[deleter called]\n"; //delete p;
+	};
+	shared_ptr<uint8_t> temp(reinterpret_cast<uint8_t*>(pointer), deleter);
 	buffer.swap(temp); // basically setting buffer = temp (also temp = buffer)
-	file.close(); //
+
+	// clean up
+	CloseHandle(h);
+	file.close();
+}
+
+// parse deconstuctor to free buffer
+parse::~parse()
+{
+	UnmapViewOfFile(buffer.get());
+	buffer.reset();
 }
 
 // read the first byte and find the length of data
@@ -79,6 +108,10 @@ void parse::parseElement()
 {
 	while (true)
 	{
+		if (positionBuffer == -1 || positionBuffer > getSize())
+		{
+			std::cout << "parse::parseElement: postionBuffer can not be -1" << std::endl;
+		}
 		id = parseEleSizeorID(false);
 		size = parseEleSizeorID(true);
 		if (!lookupElement(id, idWidth, name, type))
@@ -197,8 +230,7 @@ void parse::getData(std::ostream & os)
 
 		time_t t = time_in_nanosec;
 		struct tm buf;
-		int dateerror = gmtime_s(&buf, &t); // might only work on windows. 
-		//struct tm * buf = gmtime(&time_in_nanosec); // works on linux
+		int dateerror = gmtime_s(&buf, &t);
 
 		char dateString[80];
 		// Format time, "ddd yyyy-mm-dd hh:mm:ss zzz"

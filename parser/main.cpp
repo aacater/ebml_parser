@@ -27,11 +27,11 @@ void parseFile(const string& inputFileName, const string& outputFileName)
 	std::ofstream outFile;
 	outFile.open(outputFileName, fstream::trunc);
 	if (!outFile.is_open()){
-		string errmsg = "ERROR: main: Unable to open (" + outputFileName + ")";
-		perror(errmsg.c_str());
+		perror(("ERROR: main: Unable to open (" + outputFileName + ")").c_str());
 	}
 	
 	parse p = parse(inputFileName);
+
 	int size = p.getSize(); // get size of file
 
 	cout << "Parsing file (" << outputFileName << ")..." << endl;
@@ -41,14 +41,14 @@ void parseFile(const string& inputFileName, const string& outputFileName)
 	{
 		outFile << p; // parse and print data from file
 		pos = p.getPosition(); // update position counter
-
-		if (pos == size)
+		if (pos >= size)
 		{
 			cout << "Reached end of (" << outputFileName << "). Exiting." << endl;
 			break;
 		}
 	}
 	outFile.close();
+	p.~parse();
 }
 
 int main()
@@ -64,6 +64,5 @@ int main()
 		string outputFileName = "../test files/test" + std::to_string(i) + ".txt";
 		parseFile(inputFileName, outputFileName); // start parsing file
 	}
-	system("pause");
 	return 0;
 }
