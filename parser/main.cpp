@@ -22,19 +22,19 @@ using std::endl;
 // parses one ebml element at a time from file
 void parseFile(const string& inputFileName, const string& outputFileName)
 {
-	cout << "Opening output file..." << endl;
+	cout << "Opening output file (" << outputFileName << ")..." << endl;
 
 	std::ofstream outFile;
 	outFile.open(outputFileName, fstream::trunc);
-	if (!outFile.is_open())
-	{
-		perror("ERROR: main: Unable to open file");
+	if (!outFile.is_open()){
+		string errmsg = "ERROR: main: Unable to open (" + outputFileName + ")";
+		perror(errmsg.c_str());
 	}
 	
 	parse p = parse(inputFileName);
-	int size = p.getSize();
+	int size = p.getSize(); // get size of file
 
-	cout << "Parsing file..." << endl;
+	cout << "Parsing file (" << outputFileName << ")..." << endl;
 
 	int pos = 0;
 	while (true)
@@ -44,7 +44,7 @@ void parseFile(const string& inputFileName, const string& outputFileName)
 
 		if (pos == size)
 		{
-			cout << "Reached end of file. Exiting." << endl;
+			cout << "Reached end of (" << outputFileName << "). Exiting." << endl;
 			break;
 		}
 	}

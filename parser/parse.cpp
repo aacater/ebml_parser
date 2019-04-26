@@ -23,12 +23,12 @@ parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(
 	fileSize = file.tellg();
 	file.seekg(0);
 
-	char* pointer = reinterpret_cast<char*>(malloc(fileSize));
-	file.read(pointer, fileSize);
+	char* pointer = reinterpret_cast<char*>(malloc(fileSize)); // allocate enough buffer for whole file
+	file.read(pointer, fileSize); // read file into buffer
 	
 	shared_ptr<uint8_t> temp(reinterpret_cast<uint8_t*>(pointer));
-	buffer.swap(temp);
-	file.close();
+	buffer.swap(temp); // basically setting buffer = temp (also temp = buffer)
+	file.close(); //
 }
 
 // read the first byte and find the length of data
