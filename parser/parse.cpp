@@ -42,9 +42,12 @@ parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(
 
 	file.read(pointer, fileSize); // read file into buffer
 
-
+	// this is needed to not delete the memory
+	// for some reason if you try this then it trys to read from
+	// one byte before the pointer
+	// program works correctly if use malloc instead of CreateFileMapping/MapViewOfFile
 	auto deleter = [](uint8_t * p) {
-		std::cout << "[deleter called]\n"; //delete p;
+		std::cout << "[deleter called]\n"; // delete p;
 	};
 	shared_ptr<uint8_t> temp(reinterpret_cast<uint8_t*>(pointer), deleter);
 	buffer.swap(temp); // basically setting buffer = temp (also temp = buffer)
@@ -54,7 +57,7 @@ parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(
 	file.close();
 }
 
-// parse deconstuctor to free buffer
+// parse deconstuctor to free buffer 
 parse::~parse()
 {
 	UnmapViewOfFile(buffer.get());
