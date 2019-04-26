@@ -9,7 +9,7 @@ using std::stringstream;
 using std::shared_ptr;
 
 // reads file contents into memory
-parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(0), id(nullptr), size(nullptr), type(MASTER)
+parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(0), id(nullptr), size(nullptr), type(_MASTER)
 {
 	std::cout << "Reading from media file" << std::endl;
 	std::ifstream file;
@@ -24,6 +24,7 @@ parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(
 	file.seekg(0);
 
 	char* pointer = reinterpret_cast<char*>(malloc(fileSize)); // allocate enough buffer for whole file
+	//char* pointer = reinterpret_cast<char*>(mmap(nullptr,fileSize, PROT_READ | PROT_WRITE, MAP_PRIVATE, -1, 0));
 	file.read(pointer, fileSize); // read file into buffer
 	
 	shared_ptr<uint8_t> temp(reinterpret_cast<uint8_t*>(pointer));
@@ -132,7 +133,7 @@ int parse::getSize()
 // prints ebml element data based on element type to ostream 
 void parse::getData(std::ostream & os)
 {
-	if (type == MASTER)
+	if (type == _MASTER)
 	{
 		// master type contains other elements so no data to parse
 		os << "N/A";
@@ -143,24 +144,24 @@ void parse::getData(std::ostream & os)
 	uint8_t dataLength = getuint64(size, sizeWidth);
 	switch (type)
 	{
-	case MASTER:
+	case _MASTER:
 	{
 		os << "N/A";
 		break;
 	}
-	case UTF8: // parsed the same
-	case STRING:
+	case _UTF8: // parsed the same
+	case _STRING:
 	{
 		std::string str(data, data + dataLength); // substring
 		os << std::noshowbase << std::hex << std::nouppercase << str;
 		break;
 	}
-	case UINT:
+	case _UINT:
 	{
 		os << std::noshowbase << std::dec << getuint64(data, dataLength);
 		break;
 	}
-	case BINARY:
+	case _BINARY:
 	{
 		os << std::showbase << std::hex << std::nouppercase << std::setfill('0');
 		for (int i = 0; i < dataLength; i++)
@@ -175,7 +176,7 @@ void parse::getData(std::ostream & os)
 		}
 		break;
 	}
-	case FLOAT:
+	case _FLOAT:
 	{ // can be 4 or 8 bytes long
 		if (dataLength != 4 && dataLength != 8)
 			perror("ERROR: parse::getData: Invalid float dataLength");
@@ -184,7 +185,7 @@ void parse::getData(std::ostream & os)
 		os << std::fixed << std::dec << float_val;
 		break;
 	}
-	case DATE:
+	case _DATE:
 	{	// 8 byte integer in nanosecods
 		// 0 indicating the precise beginning of the millennium
 		
@@ -207,7 +208,7 @@ void parse::getData(std::ostream & os)
 
 		break;
 	}
-	case INT:
+	case _INT:
 	{
 		os << std::noshowbase << std::dec << int64_t(getuint64(data, dataLength));
 		break;
