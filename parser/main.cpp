@@ -32,16 +32,13 @@ void parseFile(const string& inputFileName, const string& outputFileName)
 	
 	parse p = parse(inputFileName);
 
-	int size = p.getSize(); // get size of file
-
 	cout << "Parsing file (" << outputFileName << ")..." << endl;
 
 	int pos = 0;
 	while (true)
 	{
 		outFile << p; // parse and print data from file
-		pos = p.getPosition(); // update position counter
-		if (pos >= size)
+		if (p.getPosition() >= p.getSize())
 		{
 			cout << "Reached end of (" << outputFileName << "). Exiting." << endl;
 			break;
@@ -56,7 +53,6 @@ int main()
 	// parse all test files
 	// files taken from:
 	// https://www.matroska.org/downloads/test_w1.html
-	
 	for (int i = 1; i < 9; i++)
 	{
 		if (i == 7)		// test7.mkv: lots of 0s for IDs. currently just skips until valid id. then tries to read past end of file

@@ -17,6 +17,7 @@ parse::parse(const string& fileName) : idWidth(1), sizeWidth(1), positionBuffer(
 	if (!file.is_open())
 	{
 		perror("ERROR: parse::parse: Unable to open file");
+		exit(-1);
 	}
 
 	file.seekg(0, file.end);

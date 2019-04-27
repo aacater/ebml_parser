@@ -60,15 +60,32 @@ The possible types of elements in the mkv file are:
 - test files
 
     - the test files are the mkv files that the parser is tested with
+    - the parer output is put in a .txt of the same name as the .mkv file
 
 - hex_dump.c and hexdump.txt
-
 	- hex dump of test1.mkv to verify that parser is working properly
 
 - output.txt
-
 	- where the parser prints the parsed data to
 	- currently example output of parsed data from test1.mkv
+	
+## Difficulties that we encountered
+- endianness
+	- Our computers are little endian while data is stored in big endian. This was confusing at first because we had read the write data but it was printing the wrong thing
+
+- printing data properly
+	- this was annoyingly difficult. The program kept printing data as ASCI/unicode when we didn't want it.
+
+- CreateFileMapping/MapViewOfFile
+	- For some reason when the shared_ptr deconstructor/deleter is called then it tries to read from one byte before the pointer. This causes a read violation. We got around this by defining our own deleter and not actually deallocating anything. This seems intentional for some reason but we have no idea why. This is something todo with CreateFileMapping or MapViewOfFile because when malloc is used everything works correctly.
+
+- test7.mkv
+	- This file has random garbage data in it and our parser fails to parse it correctly. The other 7 files are parsed properly. We need more error checking to be able to parse random data. 
 
 ## Some Potential Security Implications
 Since our current program reads the file into a buffer, if the file being read exceeds the possible buffer size, the file could potentially overwrite other data in memory. To avoid this, a maximum buffer size could be specified, allowing for a first buffer to be used until the maximum buffer size is reached, and then store the rest in a second buffer once the first buffer is done.
+
+Side note: We tried parsing a large video file (8 GB). However for some reason the fileSize (found using code below) is only shown as ~1.7GB. It is not always exactly the same size. We had no problems allocating that amount of memory.
+    
+    file.seekg(0, file.end);
+    fileSize = file.tellg();
